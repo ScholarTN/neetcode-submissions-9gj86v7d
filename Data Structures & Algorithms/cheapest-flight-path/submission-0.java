@@ -1,0 +1,94 @@
+
+
+class Solution {
+
+    public int findCheapestPrice(int n,
+                                 int[][] flights,
+                                 int src,
+                                 int dst,
+                                 int k) {
+
+        HashMap<Integer, ArrayList<int[]>> graph =
+                new HashMap<>();
+
+        for (int i = 0; i < n; i++) {
+            graph.put(i, new ArrayList<>());
+        }
+
+        for (int[] flight : flights) {
+
+            graph.get(flight[0]).add(
+                    new int[]{
+                            flight[1],
+                            flight[2]
+                    });
+        }
+
+        int[] prices = new int[n];
+
+        Arrays.fill(prices, Integer.MAX_VALUE);
+
+        prices[src] = 0;
+
+        Queue<int[]> queue =
+                new LinkedList<>();
+
+        queue.offer(new int[]{
+                src,
+                0
+        });
+
+        int stops = 0;
+
+        while (!queue.isEmpty() &&
+                stops <= k) {
+
+            int size = queue.size();
+
+            int[] temp =
+                    Arrays.copyOf(
+                            prices,
+                            prices.length);
+
+            for (int i = 0;
+                 i < size;
+                 i++) {
+
+                int[] current =
+                        queue.poll();
+
+                int city = current[0];
+                int cost = current[1];
+
+                for (int[] next :
+                        graph.get(city)) {
+
+                    int nei = next[0];
+                    int price = next[1];
+
+                    if (cost + price <
+                            temp[nei]) {
+
+                        temp[nei] =
+                                cost + price;
+
+                        queue.offer(
+                                new int[]{
+                                        nei,
+                                        cost + price
+                                });
+                    }
+                }
+            }
+
+            prices = temp;
+
+            stops++;
+        }
+
+        return prices[dst] ==
+                Integer.MAX_VALUE
+                ? -1
+                : prices[dst];
+    }
+}
